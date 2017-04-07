@@ -101,7 +101,7 @@ window.onresize = function() {
   var width = Math.min((window.innerWidth / 1.5), maxWidth) - margin.left - margin.right
   updateScales(width)
   updateAxes(width)
-  updateBars()
+  updateLines()
   updateOverlay(width)
 }
 
@@ -114,7 +114,7 @@ function updateAxes(width) {
     .call(d3.axisBottom(x).ticks(Math.max((width/75), 3)))
 }
 
-function updateBars() {
+function updateLines() {
   lineChart.select('path')
     .attr("d", line)
 }
