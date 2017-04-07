@@ -46,7 +46,7 @@ d3.csv("https://www1.ncdc.noaa.gov/pub/orders/CDO7735027311925.txt", row, functi
     .attr("dy", "0.7em")
     .attr("text-anchor", "end")
     .text("Temperature (deg. F)")
-});
+})
 
 var parseDate = d3.timeParse("%Y%m%d")
 
@@ -75,5 +75,5 @@ function updateAxes(width) {
 
 function updateBars() {
   lineChart.select('path')
-    .attr("d", line);
+    .attr("d", line)
 }
