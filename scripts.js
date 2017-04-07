@@ -18,7 +18,7 @@ var lineChart = d3.select(".line-chart")
 
 d3.csv("https://www1.ncdc.noaa.gov/pub/orders/CDO7735027311925.txt", row, function(error, data){
   x.domain(d3.extent(data, function(d) {return d.date}))
-  y.domain([d3.min(data, function(d) {return d.temp}), d3.max(data, function(d) {return d.temp})])
+  y.domain([0, d3.max(data, function(d) {return d.temp})])
 
   var g = lineChart.append("g")
 
@@ -46,7 +46,40 @@ d3.csv("https://www1.ncdc.noaa.gov/pub/orders/CDO7735027311925.txt", row, functi
     .attr("dy", "0.7em")
     .attr("text-anchor", "end")
     .text("Temperature (deg. F)")
+
+  // Data Cursor
+  var focus = lineChart.append("g")
+    .attr("class", "focus")
+    .style("display", "none")
+
+  focus.append("circle")
+      .attr("r", 4.5)
+      .attr("stroke", "red")
+
+  focus.append("text")
+      .attr("x", 9)
+      .attr("dy", ".35em")
+
+  lineChart.append("rect")
+      .attr("class", "overlay")
+      .attr("width", chartWidth)
+      .attr("height", chartHeight)
+      .on("mouseover", function() { focus.style("display", null); })
+      .on("mouseout", function() { focus.style("display", "none"); })
+      .on("mousemove", mousemove);
+
+  function mousemove() {
+    var x0 = x.invert(d3.mouse(this)[0]),
+        i = bisectDate(data, x0, 1),
+        d0 = data[i - 1],
+        d1 = data[i],
+        d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+    focus.attr("transform", "translate(" + x(d.date) + "," + y(d.temp) + ")");
+    focus.select("text").text(d.temp);
+  }
 })
+
+var bisectDate = d3.bisector(function(d) { return d.date; }).left
 
 var parseDate = d3.timeParse("%Y%m%d")
 
@@ -62,6 +95,7 @@ window.onresize = function() {
   updateScales(width)
   updateAxes(width)
   updateBars()
+  updateOverlay(width)
 }
 
 function updateScales(width) {
@@ -76,4 +110,9 @@ function updateAxes(width) {
 function updateBars() {
   lineChart.select('path')
     .attr("d", line)
+}
+
+function updateOverlay(width) {
+  d3.select('.overlay')
+    .attr("width", width)
 }
